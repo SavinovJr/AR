@@ -13,6 +13,8 @@ import ARKit
 class ViewController: UIViewController, ARSCNViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
+
+    private var planeNode: SCNNode?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,6 +37,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
+        configuration.planeDetection = .horizontal
 
         // Run the view's session
         sceneView.session.run(configuration)
@@ -49,14 +52,22 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
     // MARK: - ARSCNViewDelegate
     
-/*
-    // Override to create and configure nodes for anchors added to the view's session.
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
-        let node = SCNNode()
-     
-        return node
+        if (anchor is ARPlaneAnchor) {
+            planeNode = SCNNode()
+
+            // Add any node you would like, here we are simply going to place a sphere
+            let pyramid = SCNPyramid(width: 0.2, height: 0.05, length: 0.2)
+            let material = SCNMaterial()
+            material.diffuse.contents = UIColor.orange
+            pyramid.materials = [material]
+            let contentNode = SCNNode(geometry: pyramid)
+            planeNode?.addChildNode(contentNode)
+
+            return planeNode
+        }
+        return nil
     }
-*/
     
     func session(_ session: ARSession, didFailWithError error: Error) {
         // Present an error message to the user
